@@ -1,944 +1,947 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Caddam Calendar AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
-<style>
-  :root {
-    --bg:        #0a0c12;
-    --surface:   #111420;
-    --surface2:  #181c2e;
-    --border:    rgba(255,255,255,0.07);
-    --border2:   rgba(255,255,255,0.13);
-    --accent:    #5b7fff;
-    --accent2:   #a78bfa;
-    --accent3:   #34d399;
-    --text:      #e8eaf6;
-    --muted:     #7b82a0;
-    --user-bg:   linear-gradient(135deg,#3b5bdb,#6741d9);
-    --ai-bg:     #181c2e;
-    --glow:      0 0 40px rgba(91,127,255,0.18);
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CADDAM · calendar ai (vikram)</title>
+  <!-- fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- feather icons (lite) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100dvh;
-    display: flex;
-    overflow: hidden;
-  }
+    :root {
+      --bg-deep: #080c1c;
+      --bg-card: #0e1428;
+      --bg-surface: #161e34;
+      --bg-surface2: #1e2842;
+      --accent-primary: #5f8aff;
+      --accent-secondary: #b67aff;
+      --accent-glow: rgba(95, 138, 255, 0.35);
+      --text-head: #ffffff;
+      --text-body: #cbd5ff;
+      --text-muted: #7f8bb3;
+      --border-light: rgba(173, 190, 255, 0.08);
+      --border-med: rgba(173, 190, 255, 0.15);
+      --gradient-brand: linear-gradient(145deg, #5f8aff, #9f71ff);
+      --gradient-card: linear-gradient(145deg, rgba(95, 138, 255, 0.08), rgba(182, 122, 255, 0.02));
+      --shadow-heavy: 0 20px 40px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 280px;
-    min-width: 280px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  .sidebar::before {
-    content: '';
-    position: absolute;
-    top: -60px; left: -60px;
-    width: 220px; height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(91,127,255,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .brand {
-    padding: 28px 24px 22px;
-    border-bottom: 1px solid var(--border);
-  }
-  .brand-icon {
-    width: 40px; height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #3b5bdb, #a78bfa);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 12px;
-    box-shadow: 0 4px 20px rgba(91,127,255,0.35);
-  }
-  .brand-icon svg { width: 22px; height: 22px; fill: white; }
-  .brand h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 17px; font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.3px;
-  }
-  .brand p {
-    font-size: 12px; color: var(--muted);
-    margin-top: 2px; font-weight: 300;
-  }
-  .sidebar-section { padding: 20px 16px 8px; }
-  .sidebar-label {
-    font-size: 10px; font-weight: 600;
-    letter-spacing: 1.2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    padding: 0 8px;
-    margin-bottom: 8px;
-  }
-  .capability-card {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 10px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.18s;
-    margin-bottom: 4px;
-    border: 1px solid transparent;
-  }
-  .capability-card:hover {
-    background: rgba(91,127,255,0.08);
-    border-color: rgba(91,127,255,0.15);
-  }
-  .cap-icon {
-    width: 30px; height: 30px; min-width: 30px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-  .cap-icon.blue  { background: rgba(91,127,255,0.15); }
-  .cap-icon.green { background: rgba(52,211,153,0.12); }
-  .cap-icon.purple{ background: rgba(167,139,250,0.12); }
-  .cap-title { font-size: 13px; font-weight: 500; color: var(--text); }
-  .cap-desc  { font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 300; }
+    body {
+      font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-body);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      line-height: 1.5;
+    }
 
-  .divider { height: 1px; background: var(--border); margin: 12px 16px; }
+    /* animated mesh (super smooth) */
+    .mesh-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
 
-  .sidebar-section-status { padding: 8px 24px 16px; margin-top: auto; }
-  .status-row {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; color: var(--muted);
-  }
-  .status-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--accent3);
-    box-shadow: 0 0 6px rgba(52,211,153,0.6);
-    animation: pulse-dot 2s infinite;
-  }
-  @keyframes pulse-dot {
-    0%,100% { opacity: 1; } 50% { opacity: 0.5; }
-  }
-  .webhook-badge {
-    margin-top: 10px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .webhook-badge span { color: var(--accent); font-weight: 500; word-break: break-all; font-size: 10.5px; }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      mix-blend-mode: lighten;
+      animation: floatBlob 22s ease-in-out infinite;
+    }
 
-  /* ── MAIN CHAT ── */
-  .chat-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
-    position: relative;
-    min-width: 0;
-  }
+    .blob:nth-child(1) {
+      width: 700px;
+      height: 700px;
+      background: #2f4bff;
+      top: -200px;
+      left: -100px;
+      opacity: 0.25;
+    }
 
-  /* top bar */
-  .topbar {
-    padding: 18px 28px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(10,12,18,0.9);
-    backdrop-filter: blur(12px);
-    position: sticky; top: 0; z-index: 10;
-  }
-  .topbar-left { display: flex; align-items: center; gap: 12px; }
-  .topbar-avatar {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #3b5bdb, #a78bfa);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 14px rgba(91,127,255,0.3);
-  }
-  .topbar-avatar svg { width: 18px; height: 18px; fill: white; }
-  .topbar-info h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    letter-spacing: -0.2px;
-  }
-  .topbar-info p { font-size: 11.5px; color: var(--accent3); font-weight: 400; }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .icon-btn {
-    width: 34px; height: 34px; border-radius: 9px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.18s;
-    font-size: 16px;
-  }
-  .icon-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+    .blob:nth-child(2) {
+      width: 600px;
+      height: 600px;
+      background: #a55cff;
+      bottom: -250px;
+      right: -50px;
+      animation-delay: -7s;
+      opacity: 0.2;
+    }
 
-  /* messages */
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 28px 28px 12px;
-    display: flex; flex-direction: column; gap: 20px;
-    scroll-behavior: smooth;
-  }
-  .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-track { background: transparent; }
-  .messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+    .blob:nth-child(3) {
+      width: 450px;
+      height: 450px;
+      background: #1ec7b0;
+      top: 40%;
+      left: 30%;
+      filter: blur(100px);
+      opacity: 0.12;
+      animation-delay: -14s;
+    }
 
-  /* welcome */
-  .welcome-screen {
-    flex: 1;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center;
-    padding: 40px 28px;
-    gap: 6px;
-  }
-  .welcome-glow {
-    width: 80px; height: 80px; border-radius: 24px;
-    background: linear-gradient(135deg, #3b5bdb, #a78bfa);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 50px rgba(91,127,255,0.35);
-    margin-bottom: 20px;
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  .welcome-glow svg { width: 42px; height: 42px; fill: white; }
-  .welcome-screen h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px; font-weight: 800;
-    background: linear-gradient(135deg, #e8eaf6 0%, #a78bfa 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-  }
-  .welcome-screen p { font-size: 14px; color: var(--muted); margin-top: 4px; max-width: 360px; line-height: 1.6; }
-  .suggestion-chips {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    justify-content: center; margin-top: 24px; max-width: 520px;
-  }
-  .chip {
-    padding: 8px 16px;
-    border-radius: 100px;
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 13px; font-weight: 400;
-    cursor: pointer;
-    transition: all 0.18s;
-    white-space: nowrap;
-  }
-  .chip:hover {
-    background: rgba(91,127,255,0.1);
-    border-color: rgba(91,127,255,0.4);
-    color: #a5b4fc;
-  }
+    @keyframes floatBlob {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(50px, -40px) scale(1.2); }
+      66% { transform: translate(-30px, 30px) scale(0.9); }
+    }
 
-  /* message bubbles */
-  .msg-row { display: flex; gap: 12px; align-items: flex-end; }
-  .msg-row.user { flex-direction: row-reverse; }
-  .msg-avatar {
-    width: 32px; height: 32px; min-width: 32px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700;
-  }
-  .msg-avatar.ai {
-    background: linear-gradient(135deg, #3b5bdb, #a78bfa);
-    box-shadow: 0 0 10px rgba(91,127,255,0.25);
-  }
-  .msg-avatar.ai svg { width: 17px; height: 17px; fill: white; }
-  .msg-avatar.user {
-    background: linear-gradient(135deg, #6741d9, #3b5bdb);
-    color: white; font-size: 12px;
-  }
-  .bubble {
-    max-width: min(520px, 70%);
-    padding: 13px 16px;
-    border-radius: 16px;
-    font-size: 14px; line-height: 1.65;
-    position: relative;
-  }
-  .bubble.ai {
-    background: var(--ai-bg);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 4px;
-    color: var(--text);
-  }
-  .bubble.user {
-    background: var(--user-bg);
-    border-bottom-right-radius: 4px;
-    color: white;
-  }
-  .bubble.ai .event-card {
-    background: rgba(91,127,255,0.08);
-    border: 1px solid rgba(91,127,255,0.2);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-top: 10px;
-    font-size: 13px;
-  }
-  .event-card .ev-title { font-weight: 600; color: #a5b4fc; margin-bottom: 4px; }
-  .event-card .ev-row { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
-  .event-card .ev-row span { color: var(--text); }
-  .msg-time { font-size: 10.5px; color: var(--muted); margin-top: 5px; text-align: right; }
+    /* main layout */
+    .app {
+      display: flex;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      background: rgba(8, 12, 28, 0.72);
+    }
 
-  /* typing */
-  .typing-bubble {
-    display: flex; gap: 5px; padding: 14px 16px;
-  }
-  .typing-bubble span {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--muted);
-    animation: typing 1.2s infinite;
-  }
-  .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes typing {
-    0%,60%,100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-6px); opacity: 1; }
-  }
+    /* SIDEBAR — refined, minimal */
+    .sidebar {
+      width: 280px;
+      background: rgba(10, 16, 32, 0.85);
+      backdrop-filter: blur(28px);
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 16px 20px 20px;
+      gap: 32px;
+    }
 
-  /* input area */
-  .input-area {
-    padding: 16px 28px 22px;
-    border-top: 1px solid var(--border);
-    background: rgba(10,12,18,0.95);
-    backdrop-filter: blur(12px);
-  }
-  .input-row {
-    display: flex; align-items: flex-end; gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 10px 12px 10px 16px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .input-row:focus-within {
-    border-color: rgba(91,127,255,0.5);
-    box-shadow: 0 0 0 3px rgba(91,127,255,0.08);
-  }
-  textarea {
-    flex: 1;
-    background: transparent;
-    border: none; outline: none;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 400;
-    resize: none;
-    max-height: 120px;
-    line-height: 1.55;
-    caret-color: var(--accent);
-  }
-  textarea::placeholder { color: var(--muted); }
-  .send-btn {
-    width: 36px; height: 36px; min-width: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #3b5bdb, #6741d9);
-    border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 12px rgba(91,127,255,0.3);
-    transition: all 0.18s;
-  }
-  .send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(91,127,255,0.45); }
-  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .send-btn svg { width: 16px; height: 16px; fill: white; }
-  .input-hint {
-    font-size: 11px; color: var(--muted);
-    text-align: center; margin-top: 8px;
-  }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-  /* config modal */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(6px);
-    z-index: 100;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 32px;
-    width: 460px;
-    max-width: calc(100vw - 40px);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.5), var(--glow);
-    transform: translateY(12px);
-    transition: transform 0.2s;
-  }
-  .modal-overlay.open .modal { transform: translateY(0); }
-  .modal h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px; font-weight: 700;
-    margin-bottom: 6px;
-  }
-  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
-  .field-label { font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
-  .field-input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 11px 14px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    outline: none;
-    transition: border-color 0.18s;
-  }
-  .field-input:focus { border-color: rgba(91,127,255,0.5); }
-  .field-input::placeholder { color: var(--muted); }
-  .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
-  .btn-primary {
-    flex: 1; padding: 11px;
-    background: linear-gradient(135deg, #3b5bdb, #6741d9);
-    border: none; border-radius: 10px;
-    color: white; font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: opacity 0.18s;
-  }
-  .btn-primary:hover { opacity: 0.88; }
-  .btn-secondary {
-    padding: 11px 20px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; cursor: pointer;
-    transition: all 0.18s;
-  }
-  .btn-secondary:hover { border-color: var(--border2); color: var(--text); }
-  .helper-note {
-    margin-top: 16px;
-    background: rgba(91,127,255,0.07);
-    border: 1px solid rgba(91,127,255,0.15);
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 12px; color: var(--muted); line-height: 1.6;
-  }
-  .helper-note b { color: var(--accent2); }
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-brand);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px -5px rgba(95, 138, 255, 0.5);
+      color: white;
+    }
 
-  /* toast */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 12px;
-    padding: 12px 18px;
-    font-size: 13px; color: var(--text);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    transform: translateY(20px); opacity: 0;
-    transition: all 0.3s; z-index: 200;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { border-color: rgba(52,211,153,0.3); }
-  .toast.error   { border-color: rgba(239,68,68,0.3); }
+    .brand-icon i {
+      width: 24px;
+      height: 24px;
+      stroke-width: 1.8;
+    }
 
-  /* responsive */
-  @media (max-width: 700px) {
-    .sidebar { display: none; }
-    .messages { padding: 20px 16px 10px; }
-    .input-area { padding: 12px 16px 18px; }
-    .topbar { padding: 14px 16px; }
-    .bubble { max-width: 88%; }
-  }
-</style>
+    .brand-text h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .brand-text span {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .status-pill {
+      background: rgba(95, 138, 255, 0.12);
+      border: 1px solid rgba(95, 138, 255, 0.2);
+      border-radius: 100px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #b6d0ff;
+      margin-top: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4affb5;
+      box-shadow: 0 0 12px #4affb5;
+      animation: pulse 2.2s infinite;
+    }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-label {
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 1px;
+      font-weight: 600;
+      color: #4e5d8a;
+      margin-bottom: 6px;
+      padding-left: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(95, 138, 255, 0.06);
+      border-color: var(--border-med);
+      transform: translateX(4px);
+    }
+
+    .nav-item i {
+      color: #7285c2;
+      width: 20px;
+    }
+
+    .nav-item .title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #d6e0ff;
+    }
+
+    .nav-item .sub {
+      font-size: 11px;
+      color: #61709b;
+      margin-top: 2px;
+    }
+
+    .webhook-preview {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-light);
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--text-muted);
+      word-break: break-all;
+      margin-top: auto;
+    }
+
+    /* MAIN CHAT AREA */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: rgba(5, 8, 18, 0.4);
+      backdrop-filter: blur(12px);
+    }
+
+    .top-bar {
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(8, 12, 28, 0.7);
+      backdrop-filter: blur(18px);
+    }
+
+    .agent {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-brand);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 8px 20px rgba(95, 138, 255, 0.35);
+    }
+
+    .agent h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .agent p {
+      font-size: 12px;
+      color: #8c9ed9;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-med);
+      border-radius: 40px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #bbc9ff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      background: rgba(95, 138, 255, 0.1);
+      border-color: var(--accent-primary);
+      color: white;
+    }
+
+    .btn-primary {
+      background: var(--gradient-brand);
+      border: none;
+      color: white;
+      box-shadow: 0 6px 14px rgba(95, 138, 255, 0.4);
+    }
+
+    .btn-primary:hover { filter: brightness(1.1); }
+
+    /* MESSAGES */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px 32px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-thumb { background: rgba(95, 138, 255, 0.3); border-radius: 10px; }
+
+    /* welcome block — dynamic */
+    .welcome {
+      max-width: 700px;
+      margin: 0 auto;
+      animation: appear 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .welcome-header {
+      font-size: 40px;
+      font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #ffffff, #d2ddff, #adc2ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .welcome-desc {
+      font-size: 16px;
+      color: #a4b3e6;
+      margin-bottom: 32px;
+    }
+
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .chip-category {
+      width: 100%;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #7b8bc2;
+      margin-top: 12px;
+    }
+
+    .chip {
+      background: rgba(95, 138, 255, 0.06);
+      border: 1px solid var(--border-med);
+      padding: 10px 18px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #d4deff;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.18s;
+      backdrop-filter: blur(8px);
+    }
+
+    .chip i { font-size: 16px; color: #8ca3ff; }
+    .chip:hover {
+      background: rgba(95, 138, 255, 0.25);
+      border-color: var(--accent-primary);
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 10px 18px -8px var(--accent-glow);
+      color: white;
+    }
+
+    /* message rows */
+    .msg-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+      animation: msgPop 0.3s ease;
+    }
+
+    .msg-row.user { flex-direction: row-reverse; }
+
+    @keyframes msgPop {
+      0% { opacity: 0; transform: translateY(12px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .msg-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 16px;
+      background: var(--gradient-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    }
+
+    .msg-avatar.user {
+      background: linear-gradient(145deg, #9f5aff, #5f8aff);
+    }
+
+    .bubble {
+      max-width: 560px;
+      padding: 14px 20px;
+      border-radius: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: break-word;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-heavy);
+    }
+
+    .msg-row.user .bubble {
+      background: linear-gradient(145deg, #2d3f6e, #1f2d50);
+      border-bottom-right-radius: 6px;
+      color: #f0f3ff;
+    }
+
+    .msg-row.ai .bubble { border-bottom-left-radius: 6px; }
+
+    .bubble pre {
+      background: #0b1022;
+      padding: 12px;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+
+    .timestamp {
+      font-size: 10px;
+      color: #52608b;
+      margin: 4px 8px 0;
+    }
+
+    /* typing animation */
+    .typing {
+      display: flex;
+      gap: 6px;
+      padding: 16px 20px;
+    }
+    .typing span {
+      width: 8px;
+      height: 8px;
+      background: #8093d1;
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing { 0%,60%,100%{ opacity:0.3; transform:translateY(0); } 30%{ opacity:1; transform:translateY(-8px); }}
+
+    /* INPUT AREA — clean & rich */
+    .input-panel {
+      padding: 18px 32px 24px;
+      border-top: 1px solid var(--border-light);
+      background: rgba(8, 12, 28, 0.7);
+      backdrop-filter: blur(24px);
+    }
+
+    .quick-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 14px;
+      margin-bottom: 8px;
+      scrollbar-width: none;
+    }
+
+    .quick-row::-webkit-scrollbar { display: none; }
+
+    .quick-chip {
+      background: rgba(95, 138, 255, 0.04);
+      border: 1px solid var(--border-light);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 13px;
+      color: #b0c2ff;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .quick-chip:hover {
+      background: rgba(95, 138, 255, 0.2);
+      border-color: var(--accent-primary);
+      color: white;
+    }
+
+    .input-box {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-med);
+      border-radius: 40px;
+      padding: 8px 8px 8px 24px;
+      transition: 0.2s;
+    }
+
+    .input-box:focus-within {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px rgba(95, 138, 255, 0.2);
+    }
+
+    textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      resize: none;
+      max-height: 110px;
+      padding: 10px 0;
+    }
+
+    textarea::placeholder { color: #556188; }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient-brand);
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 18px var(--accent-glow);
+      transition: 0.2s;
+    }
+
+    .send-btn:hover { transform: scale(1.07); }
+    .send-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+    .hint {
+      font-size: 11px;
+      color: #3f4b73;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    /* modal overlay */
+    .modal-overlay {
+      position: fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(16px);
+      display:flex; align-items:center; justify-content:center; z-index:200;
+      opacity:0; pointer-events:none; transition:0.25s;
+    }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+
+    .modal-card {
+      background: #131b33; border:1px solid rgba(255,255,255,0.05); border-radius:32px;
+      padding:32px; width:500px; max-width:calc(100vw-40px);
+      box-shadow:0 40px 70px #00000070;
+    }
+
+    .tabs { display:flex; gap:8px; background: #0b1124; border-radius:60px; padding:4px; margin:20px 0; }
+    .tab { flex:1; padding:10px; border-radius:40px; background:transparent; border:none; color:#7f8fc7; cursor:pointer; font-weight:500; }
+    .tab.active { background: #233157; color:white; }
+
+    .field { margin-bottom:18px; }
+    .field label { font-size:12px; color:#9aacf0; }
+    .field input { width:100%; background:#0d132b; border:1px solid #293a62; border-radius:16px; padding:14px 18px; color:white; margin-top:6px; }
+
+    .toast {
+      position:fixed; bottom:30px; right:30px; background:#1e2842; border:1px solid #5f8aff; border-radius:40px;
+      padding:12px 22px; color:white; font-size:14px; box-shadow:0 8px 28px black; z-index:400;
+      transform:translateY(20px); opacity:0; transition:0.25s;
+    }
+    .toast.show { transform:none; opacity:1; }
+  </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="brand">
-    <div class="brand-icon">
-      <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg>
-    </div>
-    <h1>Caddam Calendar AI</h1>
-    <p>n8n Automation · Vikram</p>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Capabilities</div>
-    <div class="capability-card" onclick="insertChip('Create an event for tomorrow at 3pm')">
-      <div class="cap-icon blue">📅</div>
-      <div><div class="cap-title">Create Events</div><div class="cap-desc">Natural language scheduling</div></div>
-    </div>
-    <div class="capability-card" onclick="insertChip('Show my events today')">
-      <div class="cap-icon green">🔍</div>
-      <div><div class="cap-title">Retrieve Events</div><div class="cap-desc">View & search calendar</div></div>
-    </div>
-    <div class="capability-card" onclick="insertChip('What do I have this weekend?')">
-      <div class="cap-icon purple">💬</div>
-      <div><div class="cap-title">Natural Language</div><div class="cap-desc">Just talk, no commands</div></div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-label">Quick Actions</div>
-    <div class="capability-card" onclick="insertChip('Schedule a team meeting next Monday at 10am')">
-      <div class="cap-icon blue">🤝</div>
-      <div><div class="cap-title">Team Meeting</div><div class="cap-desc">Book instantly</div></div>
-    </div>
-    <div class="capability-card" onclick="insertChip('Add dentist appointment this Friday at 2pm')">
-      <div class="cap-icon green">🏥</div>
-      <div><div class="cap-title">Appointment</div><div class="cap-desc">Medical & personal</div></div>
-    </div>
-  </div>
-
-  <div style="flex:1"></div>
-  <div class="sidebar-section-status">
-    <div class="divider" style="margin: 0 0 12px;"></div>
-    <div class="status-row">
-      <div class="status-dot" id="connDot"></div>
-      <span id="connText">Not connected</span>
-    </div>
-    <div class="webhook-badge">
-      n8n webhook:<br/>
-      <span id="webhookDisplay">Click ⚙ to configure</span>
-    </div>
-  </div>
-</aside>
-
-<!-- CHAT AREA -->
-<div class="chat-area">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-avatar">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-      </div>
-      <div class="topbar-info">
-        <h2>Calendar AI Agent</h2>
-        <p id="topbarStatus">● Powered by n8n + Gemini</p>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <button class="icon-btn" onclick="clearChat()" title="Clear chat">🗑</button>
-      <button class="icon-btn" onclick="openConfig()" title="Configure webhook">⚙️</button>
-    </div>
-  </div>
-
-  <div class="messages" id="messages">
-    <div class="welcome-screen" id="welcome">
-      <div class="welcome-glow">
-        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1zM7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/></svg>
-      </div>
-      <h2>Your AI Calendar Assistant</h2>
-      <p>Manage your Google Calendar with natural language. Create events, check your schedule, and more — all through chat.</p>
-      <div class="suggestion-chips">
-        <span class="chip" onclick="insertChip('What events do I have today?')">📅 Today's events</span>
-        <span class="chip" onclick="insertChip('Book a meeting tomorrow at 10am')">➕ Create event</span>
-        <span class="chip" onclick="insertChip('Show my schedule this week')">📆 This week</span>
-        <span class="chip" onclick="insertChip('Add a dentist at 3pm this Friday')">🏥 Quick book</span>
-        <span class="chip" onclick="insertChip('What do I have next Monday morning?')">🔍 Search schedule</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="input-area">
-    <div class="input-row">
-      <textarea
-        id="msgInput"
-        rows="1"
-        placeholder="Ask about your calendar or create an event…"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-      ></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
-    </div>
-    <div class="input-hint">Press <kbd style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:10px">Enter</kbd> to send · <kbd style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:10px">Shift+Enter</kbd> for new line</div>
-  </div>
+<div class="mesh-bg">
+  <div class="blob"></div><div class="blob"></div><div class="blob"></div>
 </div>
 
-<!-- CONFIG MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeConfigOutside(event)">
-  <div class="modal">
-    <h3>⚙️ Connect to n8n</h3>
-    <p>Enter your n8n webhook URL. If you get CORS errors, use proxy mode.</p>
+<div class="app">
 
-    <!-- Mode tabs -->
-    <div style="display:flex;gap:6px;margin-bottom:18px;">
-      <button id="tabDirect" onclick="setMode('direct')"
-        style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(91,127,255,0.5);background:rgba(91,127,255,0.12);color:#a5b4fc;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;">
-        Direct (n8n CORS enabled)
-      </button>
-      <button id="tabProxy" onclick="setMode('proxy')"
-        style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;">
-        Proxy mode (no CORS needed)
-      </button>
-    </div>
-
-    <!-- Direct mode -->
-    <div id="modeDirect">
-      <div class="field-label">n8n Webhook URL</div>
-      <input class="field-input" id="webhookInput" type="url"
-        placeholder="https://your-n8n.app.n8n.cloud/webhook/xxxxxxxx"/>
-      <div class="field-label" style="margin-top:14px">Session ID</div>
-      <input class="field-input" id="sessionInput" type="text"
-        placeholder="calendar-user-1" value="calendar-user-1"/>
-      <div class="helper-note" style="margin-top:14px">
-        <b>Required: enable CORS in n8n</b><br/>
-        1. Open workflow → click <b>Chat Trigger</b> node<br/>
-        2. Click <b>Options</b> at the bottom of the node<br/>
-        3. Set <b>Allowed Origins (CORS)</b> → <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px">*</code><br/>
-        4. Save → deactivate → re-activate the workflow<br/><br/>
-        <b>Workflow must be ACTIVATED</b> (green toggle, top-right in n8n)
+  <!-- SIDEBAR refined -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-icon"><i data-feather="calendar"></i></div>
+        <div class="brand-text">
+          <h2>Caddam AI</h2>
+          <span>by Vikram · n8n</span>
+        </div>
+      </div>
+      <div class="status-pill" id="sideStatus">
+        <span class="dot" id="connDot"></span>
+        <span id="connLabel">disconnected</span>
       </div>
     </div>
 
-    <!-- Proxy mode -->
-    <div id="modeProxy" style="display:none">
-      <div class="helper-note" style="margin-bottom:14px;border-color:rgba(52,211,153,0.25);background:rgba(52,211,153,0.06)">
-        <b style="color:#6ee7b7">No CORS setup needed.</b> Your backend calls n8n — browser never touches n8n directly.<br/><br/>
-        Run <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px">node proxy.js</code> from the downloaded folder, then point to it below.
+    <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:26px;">
+      <!-- event shortcuts -->
+      <div class="nav-section">
+        <div class="nav-label">📌 schedule</div>
+        <div class="nav-item" onclick="sendChip('team standup tomorrow 10am 30min')"><i data-feather="users" width="18"></i><div><div class="title">Standup</div><div class="sub">tom 10:00 · 30m</div></div></div>
+        <div class="nav-item" onclick="sendChip('dentist this friday 3pm 1h')"><i data-feather="activity"></i><div><div class="title">Dentist</div><div class="sub">fri 15:00 · 1h</div></div></div>
+        <div class="nav-item" onclick="sendChip('gym today 6pm 1h')"><i data-feather="zap"></i><div><div class="title">Gym</div><div class="sub">today 18:00</div></div></div>
+        <div class="nav-item" onclick="sendChip('client call next tue 11am 45min')"><i data-feather="phone"></i><div><div class="title">Client call</div><div class="sub">tue 11:00</div></div></div>
       </div>
-      <div class="field-label">Proxy URL</div>
-      <input class="field-input" id="proxyInput" type="url"
-        placeholder="http://localhost:3001/chat" value="http://localhost:3001/chat"/>
-      <div class="field-label" style="margin-top:14px">Session ID</div>
-      <input class="field-input" id="sessionInput2" type="text"
-        placeholder="calendar-user-1" value="calendar-user-1"/>
-      <div class="helper-note" style="margin-top:14px">
-        <b>Setup:</b><br/>
-        1. Download <b>proxy.js</b> (provided alongside this file)<br/>
-        2. Edit <b>N8N_WEBHOOK_URL</b> inside proxy.js<br/>
-        3. Run: <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px">npm install express cors &amp;&amp; node proxy.js</code><br/>
-        4. For production deploy proxy.js on Render / Railway / your VPS
+      <div class="nav-section">
+        <div class="nav-label">🔎 view</div>
+        <div class="nav-item" onclick="sendChip('what do i have today?')"><i data-feather="list"></i><div><div class="title">Today's agenda</div></div></div>
+        <div class="nav-item" onclick="sendChip('show this week schedule')"><i data-feather="calendar"></i><div><div class="title">This week</div></div></div>
+        <div class="nav-item" onclick="sendChip('am i free tomorrow 2-5pm?')"><i data-feather="clock"></i><div><div class="title">Check slot</div></div></div>
       </div>
     </div>
 
-    <div id="testResult" style="display:none;margin-top:12px;padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.6;white-space:pre-line"></div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="testConnection()">🔌 Test</button>
-      <button class="btn-secondary" onclick="closeConfig()">Cancel</button>
-      <button class="btn-primary" onclick="saveConfig()">Save & Connect</button>
+    <div class="webhook-preview" id="webhookDisplay">⚙️ configure webhook</div>
+  </aside>
+
+  <!-- main chat -->
+  <div class="chat-area">
+    <div class="top-bar">
+      <div class="agent">
+        <div class="avatar"><i data-feather="message-square"></i></div>
+        <div>
+          <h4>Vikram's calendar</h4>
+          <p id="topStatus"><span class="dot" style="width:6px;height:6px;"></span> n8n + gemini</p>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button class="btn" onclick="clearChat()"><i data-feather="trash-2" width="16"></i> Clear</button>
+        <button class="btn btn-primary" onclick="openCfg()"><i data-feather="settings"></i> Connect</button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <!-- welcome injected via js -->
+    </div>
+
+    <!-- input panel -->
+    <div class="input-panel">
+      <div class="quick-row" id="quickChipRow">
+        <span class="quick-chip" onclick="sendChip('today events')"><i data-feather="sun"></i> Today</span>
+        <span class="quick-chip" onclick="sendChip('tomorrow schedule')"><i data-feather="chevrons-right"></i> Tomorrow</span>
+        <span class="quick-chip" onclick="sendChip('this week')"><i data-feather="calendar"></i> Week</span>
+        <span class="quick-chip" onclick="sendChip('free this afternoon?')"><i data-feather="check-circle"></i> Free now?</span>
+        <span class="quick-chip" onclick="sendChip('add meeting tomorrow 2pm design review')"><i data-feather="plus-circle"></i> Quick add</span>
+        <span class="quick-chip" onclick="sendChip('reschedule my 3pm to 4pm')"><i data-feather="refresh-cw"></i> Reschedule</span>
+        <span class="quick-chip" onclick="sendChip('cancel my next meeting')"><i data-feather="x-circle"></i> Cancel</span>
+        <span class="quick-chip" onclick="sendChip('weekend plans')"><i data-feather="cloud"></i> Weekend</span>
+      </div>
+
+      <div class="input-box">
+        <textarea id="msgInput" rows="1" placeholder="e.g. Book a meeting tomorrow 10am ..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()"><i data-feather="arrow-right"></i></button>
+      </div>
+      <div class="hint"><kbd>↵</kbd> send · <kbd>⇧↵</kbd> new line</div>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- modal config -->
+<div class="modal-overlay" id="overlay" onclick="if(event.target===this) closeCfg()">
+  <div class="modal-card">
+    <h3 style="color:white; font-size:22px;">⚡ connect to n8n</h3>
+    <p style="color:#97abeb; margin-bottom:16px;">webhook or proxy – paste your endpoint</p>
+    <div class="tabs">
+      <button class="tab active" id="tabD" onclick="setMode('direct')">Direct (CORS)</button>
+      <button class="tab" id="tabP" onclick="setMode('proxy')">Proxy</button>
+    </div>
+
+    <div id="divDirect">
+      <div class="field"><label>Webhook URL</label><input id="wInput" placeholder="https://your-ngrok.app/webhook/..." value=""></div>
+    </div>
+    <div id="divProxy" style="display:none">
+      <div class="field"><label>Proxy URL</label><input id="pInput" placeholder="http://localhost:3001/chat" value="http://localhost:3001/chat"></div>
+    </div>
+    <div class="field"><label>Session ID (optional)</label><input id="sInput" value="vikram-calendar"></div>
+
+    <div style="display:flex; gap:10px; margin-top:28px;">
+      <button class="btn" style="flex:1" onclick="testConn()">🔌 test</button>
+      <button class="btn" style="flex:1" onclick="closeCfg()">cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="saveCfg()">save & connect</button>
+    </div>
+    <div id="testBox" style="margin-top:16px; font-size:13px;"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <script>
-  let webhookUrl = localStorage.getItem('n8n_webhook') || '';
-  let sessionId  = localStorage.getItem('n8n_session') || 'calendar-user-1';
-  let chatHistory = [];
-  let isLoading = false;
+  feather.replace();
 
-  // ── init ──────────────────────────────────────────────
-  function init() {
-    if (webhookUrl) {
-      document.getElementById('webhookInput').value = webhookUrl;
-      document.getElementById('sessionInput').value = sessionId;
-      updateConnectionUI(true);
+  // state
+  let wUrl = localStorage.getItem('n8n_webhook') || '';
+  let pUrl = localStorage.getItem('n8n_proxy') || 'http://localhost:3001/chat';
+  let session = localStorage.getItem('n8n_session') || 'vikram-calendar';
+  let mode = localStorage.getItem('n8n_mode') || 'direct';
+  let busy = false;
+
+  // init UI
+  window.addEventListener('load', ()=>{
+    renderWelcome();
+    setMode(mode, false);
+    document.getElementById('wInput').value = wUrl;
+    document.getElementById('pInput').value = pUrl;
+    document.getElementById('sInput').value = session;
+    updateConnStatus(!!((mode==='direct'?wUrl:pUrl)));
+    feather.replace();
+  });
+
+  function setMode(m, save=true){
+    mode = m;
+    if(save) localStorage.setItem('n8n_mode',m);
+    document.getElementById('divDirect').style.display = m==='direct'?'':'none';
+    document.getElementById('divProxy').style.display = m==='proxy'?'':'none';
+    document.getElementById('tabD').className = 'tab' + (m==='direct'?' active':'');
+    document.getElementById('tabP').className = 'tab' + (m==='proxy'?' active':'');
+  }
+
+  function updateConnStatus(ok){
+    const dot = document.getElementById('connDot');
+    const label = document.getElementById('connLabel');
+    const webhookDisplay = document.getElementById('webhookDisplay');
+    const topStatus = document.getElementById('topStatus');
+    if(ok){
+      dot.style.background = '#4affb5'; dot.style.boxShadow = '0 0 12px #4affb5';
+      label.innerText = 'connected';
+      webhookDisplay.innerText = mode==='direct'?wUrl.slice(0,35)+'…':pUrl.slice(0,35)+'…';
+      topStatus.innerHTML = `<span class="dot" style="width:6px;height:6px;background:#4affb5;"></span> live · n8n`;
     } else {
-      setTimeout(() => openConfig(), 600);
+      dot.style.background = '#ff7790'; dot.style.boxShadow = '0 0 12px #ff7790';
+      label.innerText = 'disconnected';
+      webhookDisplay.innerText = '⚙️ click to connect';
+      topStatus.innerHTML = `<span class="dot" style="width:6px;height:6px;background:#ff7790;"></span> not connected`;
     }
+    feather.replace();
   }
 
-  function updateConnectionUI(connected, label) {
-    const dot  = document.getElementById('connDot');
-    const text = document.getElementById('connText');
-    const disp = document.getElementById('webhookDisplay');
-    const top  = document.getElementById('topbarStatus');
-    if (connected) {
-      dot.style.background = '#34d399';
-      dot.style.boxShadow  = '0 0 6px rgba(52,211,153,0.6)';
-      text.textContent = label || 'Connected';
-      const short = webhookUrl.length > 34 ? webhookUrl.slice(0,34)+'…' : webhookUrl;
-      disp.textContent = short;
-      top.textContent = '● Powered by n8n + Gemini';
-      top.style.color = '#34d399';
+  function openCfg(){ document.getElementById('overlay').classList.add('open'); }
+  function closeCfg(){ document.getElementById('overlay').classList.remove('open'); }
+
+  function saveCfg(){
+    if(mode==='direct'){
+      wUrl = document.getElementById('wInput').value.trim();
+      if(!wUrl){ toast('enter webhook url','error'); return; }
+      localStorage.setItem('n8n_webhook', wUrl);
     } else {
-      dot.style.background = '#f87171';
-      dot.style.boxShadow  = '0 0 6px rgba(248,113,113,0.5)';
-      text.textContent = 'Not connected';
-      disp.textContent = 'Click ⚙ to configure';
-      top.textContent = '● Not connected — click ⚙ to setup';
-      top.style.color = '#f87171';
+      pUrl = document.getElementById('pInput').value.trim();
+      if(!pUrl){ toast('enter proxy url','error'); return; }
+      localStorage.setItem('n8n_proxy', pUrl);
+    }
+    session = document.getElementById('sInput').value.trim() || 'vikram-calendar';
+    localStorage.setItem('n8n_session', session);
+    updateConnStatus(true);
+    closeCfg();
+    toast('✅ connection saved','success');
+  }
+
+  async function testConn(){
+    const url = mode==='direct'? document.getElementById('wInput').value.trim() : document.getElementById('pInput').value.trim();
+    if(!url){ showTestMsg('enter url first','error'); return; }
+    showTestMsg('testing…','info');
+    try{
+      const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'sendMessage',chatInput:'ping', sessionId:'test'}) });
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      showTestMsg('✅ success! response received','success');
+    }catch(e){
+      if(e.message.includes('Failed to fetch') || e.name==='TypeError')
+        showTestMsg('❌ CORS or connection refused.\n→ enable CORS in n8n or run proxy.','error');
+      else showTestMsg('❌ '+e.message,'error');
     }
   }
 
-  // ── config modal ──────────────────────────────────────
-  function openConfig() {
-    document.getElementById('modalOverlay').classList.add('open');
-    document.getElementById('testResult').style.display = 'none';
-    setTimeout(() => document.getElementById('webhookInput').focus(), 120);
-  }
-  function closeConfig() {
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
-  function closeConfigOutside(e) {
-    if (e.target === document.getElementById('modalOverlay')) closeConfig();
-  }
-  function saveConfig() {
-    const url = document.getElementById('webhookInput').value.trim();
-    const sid = document.getElementById('sessionInput').value.trim() || 'calendar-user-1';
-    if (!url) { showToast('⚠️ Please enter a webhook URL', 'error'); return; }
-    if (!url.startsWith('http')) { showToast('⚠️ URL must start with https://', 'error'); return; }
-    webhookUrl = url;
-    sessionId  = sid;
-    localStorage.setItem('n8n_webhook', url);
-    localStorage.setItem('n8n_session', sid);
-    updateConnectionUI(true);
-    closeConfig();
-    showToast('✅ Saved! Send a message to test.', 'success');
+  function showTestMsg(t,type){
+    const box = document.getElementById('testBox');
+    box.style.padding = '10px'; box.style.borderRadius='12px';
+    if(type==='error'){ box.style.background='rgba(255,100,120,0.2)'; box.style.color='#ffb0bb'; }
+    else if(type==='success'){ box.style.background='rgba(74,255,181,0.1)'; box.style.color='#a6ffd6'; }
+    else { box.style.background='rgba(95,138,255,0.1)'; box.style.color='#bfd0ff'; }
+    box.innerText = t;
   }
 
-  // ── test connection ───────────────────────────────────
-  async function testConnection() {
-    const url = document.getElementById('webhookInput').value.trim();
-    const box = document.getElementById('testResult');
-    if (!url) { showTestResult('error', '⚠️ Enter a webhook URL first.'); return; }
+  // chat helpers
+  function autoResize(t){ t.style.height='auto'; t.style.height = Math.min(t.scrollHeight,110)+'px'; }
+  function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); }}
 
-    showTestResult('info', '🔄 Testing connection…');
-    try {
-      // n8n Chat Trigger expects: { action, chatInput, sessionId }
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'sendMessage', chatInput: 'ping', sessionId: 'test-ping' })
-      });
-      const status = res.status;
-      if (status === 404) {
-        showTestResult('error', '❌ 404 — Webhook not found.\n→ Check the URL is correct.\n→ Make sure the workflow is ACTIVATED (green toggle in n8n).\n→ Use the Production URL, not the Test URL.');
-      } else if (status === 0 || status === undefined) {
-        showTestResult('error', '❌ CORS blocked — browser rejected the request.\n→ In n8n: Chat Trigger node → Options → Allowed Origins → set to  *\n→ Then re-activate the workflow.');
-      } else if (!res.ok) {
-        showTestResult('error', `❌ HTTP ${status} — ${res.statusText}\n→ Workflow may be inactive or URL is wrong.`);
-      } else {
-        const data = await res.json().catch(() => ({}));
-        const reply = data.output || data.text || data.message || JSON.stringify(data);
-        showTestResult('success', `✅ Connected! n8n responded:\n"${reply.slice(0,120)}"`);
-      }
-    } catch(err) {
-      if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-        showTestResult('error',
-          '❌ CORS error — browser blocked the request.\n\nFix in n8n:\n1. Open Chat Trigger node\n2. Click "Options"\n3. Set Allowed Origins (CORS) = *\n4. Save → re-activate workflow\n\nAlternatively host this HTML on the same domain as n8n.');
-      } else {
-        showTestResult('error', '❌ ' + err.message);
-      }
-    }
-  }
-
-  function showTestResult(type, msg) {
-    const box = document.getElementById('testResult');
-    box.style.display = 'block';
-    box.style.whiteSpace = 'pre-line';
-    const colors = {
-      success: { bg:'rgba(52,211,153,0.08)', border:'rgba(52,211,153,0.25)', text:'#6ee7b7' },
-      error:   { bg:'rgba(248,113,113,0.08)', border:'rgba(248,113,113,0.25)', text:'#fca5a5' },
-      info:    { bg:'rgba(91,127,255,0.08)', border:'rgba(91,127,255,0.2)',   text:'#a5b4fc' }
-    };
-    const c = colors[type] || colors.info;
-    box.style.background = c.bg;
-    box.style.border = `1px solid ${c.border}`;
-    box.style.color  = c.text;
-    box.textContent  = msg;
-  }
-
-  // ── messaging ─────────────────────────────────────────
-  function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  }
-  function insertChip(text) {
-    const inp = document.getElementById('msgInput');
-    inp.value = text;
-    autoResize(inp);
-    inp.focus();
+  function sendChip(text){
+    document.getElementById('welcome')?.remove();
+    document.getElementById('msgInput').value = text;
+    autoResize(document.getElementById('msgInput'));
     sendMessage();
   }
 
-  // Build the exact payload n8n Chat Trigger expects
-  function buildPayload(text) {
-    return {
-      action: 'sendMessage',   // required by n8n chat trigger
-      chatInput: text,          // the field your agent reads: $json.chatInput
-      sessionId: sessionId      // ties conversation to Window Buffer Memory
-    };
-  }
-
-  // Parse whatever n8n returns — handles all response shapes
-  function extractReply(data) {
-    if (typeof data === 'string') return data;
-    // Standard n8n AI agent response
-    if (data.output)         return data.output;
-    // Chat trigger wrapper
-    if (data.text)           return data.text;
-    if (data.message)        return data.message;
-    if (data.response)       return data.response;
-    if (data.chatOutput)     return data.chatOutput;
-    // Array response
-    if (Array.isArray(data)) {
-      const first = data[0];
-      if (typeof first === 'string') return first;
-      return first?.output || first?.text || first?.message || JSON.stringify(first, null, 2);
-    }
-    // Nested
-    if (data.data?.output)   return data.data.output;
-    if (data.result)         return data.result;
-    // Fallback — show raw so user can debug
-    return '```\n' + JSON.stringify(data, null, 2) + '\n```';
-  }
-
-  async function sendMessage() {
-    const input = document.getElementById('msgInput');
-    const text  = input.value.trim();
-    if (!text || isLoading) return;
-    if (!webhookUrl) { openConfig(); showToast('⚠️ Set your webhook URL first', 'error'); return; }
-
+  async function sendMessage(){
+    const inp = document.getElementById('msgInput');
+    const text = inp.value.trim();
+    if(!text || busy) return;
+    const url = mode==='direct'? wUrl : pUrl;
+    if(!url){ openCfg(); toast('configure connection first','error'); return; }
     document.getElementById('welcome')?.remove();
     addMessage('user', text);
-    input.value = ''; autoResize(input);
-    setLoading(true);
+    inp.value = ''; autoResize(inp);
+    busy = true; document.getElementById('sendBtn').disabled = true;
+    showTyping();
 
     try {
-      const res = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(buildPayload(text))
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'sendMessage', chatInput:text, sessionId:session })
       });
-
-      if (!res.ok) {
-        if (res.status === 404) throw new Error('404_NOT_FOUND');
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-
+      if(!res.ok) throw new Error(res.status===404?'404_NOT_FOUND':`HTTP ${res.status}`);
       const data = await res.json();
-      const reply = extractReply(data);
       removeTyping();
+      const reply = data.output || data.text || data.message || data.response || JSON.stringify(data,null,2);
       addMessage('ai', reply);
-    } catch (err) {
+    } catch(e){
       removeTyping();
-      let errMsg = '';
-      let hint   = '';
-
-      if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-        errMsg = '**Connection blocked by CORS**';
-        hint   = 'Fix: In n8n → Chat Trigger node → Options → set **Allowed Origins** to `*` → re-activate the workflow.';
-      } else if (err.message === '404_NOT_FOUND') {
-        errMsg = '**Webhook not found (404)**';
-        hint   = 'Fix: Check your URL is correct. Make sure the workflow is **activated** (green toggle in n8n top-right). Use the **Production** URL, not the Test URL.';
-      } else {
-        errMsg = `**Error:** ${err.message}`;
-        hint   = 'Open ⚙ Settings → click **Test** to diagnose.';
-      }
-
-      addMessage('ai', `${errMsg}\n\n${hint}`, true);
-      showToast('❌ ' + (err.message === 'Failed to fetch' ? 'CORS blocked' : err.message), 'error');
+      let errMsg = e.message;
+      if(e.message==='404_NOT_FOUND') errMsg = '❌ webhook not found — activate n8n workflow';
+      else if(e.name==='TypeError') errMsg = '❌ CORS blocked — see settings';
+      addMessage('ai', `**error**\n${errMsg}`, true);
+      toast('connection failed','error');
     }
-    setLoading(false);
+    busy = false; document.getElementById('sendBtn').disabled = false;
   }
 
-  function setLoading(state) {
-    isLoading = state;
-    document.getElementById('sendBtn').disabled = state;
-    if (state) {
-      const row = document.createElement('div');
-      row.className = 'msg-row'; row.id = 'typing-row';
-      row.innerHTML = `
-        <div class="msg-avatar ai"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg></div>
-        <div class="bubble ai"><div class="typing-bubble"><span></span><span></span><span></span></div></div>`;
-      document.getElementById('messages').appendChild(row);
-      scrollBottom();
-    }
+  function showTyping(){
+    const row = document.createElement('div'); row.className='msg-row'; row.id='typing-row';
+    row.innerHTML = `<div class="msg-avatar ai"><i data-feather="cpu"></i></div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    document.getElementById('messages').appendChild(row);
+    feather.replace(); scrollToBottom();
   }
-  function removeTyping() { document.getElementById('typing-row')?.remove(); }
+  function removeTyping(){ document.getElementById('typing-row')?.remove(); }
 
-  function addMessage(role, text, isError=false) {
+  function addMessage(role, text, isErr=false){
     const msgs = document.getElementById('messages');
-    const now  = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-    const row  = document.createElement('div');
-    row.className = `msg-row ${role}`;
-
-    const avatarHtml = role === 'ai'
-      ? `<div class="msg-avatar ai"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg></div>`
-      : `<div class="msg-avatar user">V</div>`;
-
-    row.innerHTML = `
-      ${avatarHtml}
-      <div>
-        <div class="bubble ${role}${isError?' error':''}">${formatText(text)}</div>
-        <div class="msg-time">${now}</div>
-      </div>`;
-
+    const row = document.createElement('div'); row.className=`msg-row ${role}`;
+    const avatar = role==='ai'? '<div class="msg-avatar ai"><i data-feather="cpu"></i></div>' : '<div class="msg-avatar user">V</div>';
+    const bubbleClass = `bubble ${role}${isErr?' error':''}`;
+    const time = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    row.innerHTML = `${avatar}<div><div class="${bubbleClass}">${formatMessage(text)}</div><div class="timestamp">${time}</div></div>`;
     msgs.appendChild(row);
-    scrollBottom();
-    row.style.opacity = '0'; row.style.transform = 'translateY(8px)';
-    requestAnimationFrame(() => {
-      row.style.transition = 'opacity 0.25s, transform 0.25s';
-      row.style.opacity = '1'; row.style.transform = 'translateY(0)';
-    });
+    feather.replace(); scrollToBottom();
   }
 
-  function formatText(text) {
-    return text
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g,'<em>$1</em>')
-      .replace(/```([\s\S]*?)```/g,'<pre style="background:rgba(0,0,0,0.3);padding:10px 12px;border-radius:8px;font-size:12px;overflow-x:auto;margin-top:6px">$1</pre>')
-      .replace(/`(.*?)`/g,'<code style="background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px;font-size:12.5px">$1</code>')
-      .replace(/\n/g,'<br/>');
+  function formatMessage(t){
+    let escaped = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    escaped = escaped.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`(.*?)`/g,'<code style="background:#1b2540; padding:2px 6px; border-radius:6px;">$1</code>');
+    return escaped.replace(/\n/g,'<br>');
   }
 
-  function scrollBottom() {
-    const msgs = document.getElementById('messages');
-    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+  function scrollToBottom(){ setTimeout(()=>{ const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; },30); }
+
+  function clearChat(){
+    document.getElementById('messages').innerHTML = '';
+    renderWelcome();
+    toast('chat cleared','');
   }
 
-  function clearChat() {
-    chatHistory = [];
-    const msgs = document.getElementById('messages');
-    msgs.innerHTML = '';
-    const welcome = document.createElement('div');
-    welcome.id = 'welcome'; welcome.className = 'welcome-screen';
-    welcome.innerHTML = `
-      <div class="welcome-glow">
-        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1zM7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/></svg>
+  function renderWelcome(){
+    const msgDiv = document.getElementById('messages');
+    msgDiv.innerHTML = `<div class="welcome" id="welcome">
+      <div class="welcome-header">hey, i'm <br>Vikram's calendar</div>
+      <div class="welcome-desc">Schedule · check · manage — just chat or tap a chip.</div>
+      <div class="chip-category">✨ create</div>
+      <div class="chip-grid">
+        <span class="chip" onclick="sendChip('book team meeting tomorrow 10am 30min')"><i data-feather="users"></i>team meeting</span>
+        <span class="chip" onclick="sendChip('dentist this friday 3pm 1h')"><i data-feather="activity"></i>dentist fri</span>
+        <span class="chip" onclick="sendChip('gym today 6pm 1h')"><i data-feather="zap"></i>gym today</span>
+        <span class="chip" onclick="sendChip('birthday dinner sat 7:30pm')"><i data-feather="gift"></i>birthday</span>
+        <span class="chip" onclick="sendChip('coffee chat tomorrow 9am 30min')"><i data-feather="coffee"></i>coffee chat</span>
       </div>
-      <h2>Your AI Calendar Assistant</h2>
-      <p>Manage your Google Calendar with natural language. Create events, check your schedule, and more — all through chat.</p>
-      <div class="suggestion-chips">
-        <span class="chip" onclick="insertChip('What events do I have today?')">📅 Today's events</span>
-        <span class="chip" onclick="insertChip('Book a meeting tomorrow at 10am')">➕ Create event</span>
-        <span class="chip" onclick="insertChip('Show my schedule this week')">📆 This week</span>
-        <span class="chip" onclick="insertChip('Add a dentist at 3pm this Friday')">🏥 Quick book</span>
-      </div>`;
-    msgs.appendChild(welcome);
-    showToast('🗑 Chat cleared', '');
+      <div class="chip-category">🔍 view / check</div>
+      <div class="chip-grid">
+        <span class="chip" onclick="sendChip('what do i have today?')"><i data-feather="list"></i>today</span>
+        <span class="chip" onclick="sendChip('show this week')"><i data-feather="calendar"></i>this week</span>
+        <span class="chip" onclick="sendChip('am i free tomorrow afternoon?')"><i data-feather="check-square"></i>free tomorrow</span>
+        <span class="chip" onclick="sendChip('weekend events')"><i data-feather="cloud"></i>weekend</span>
+      </div>
+    </div>`;
+    feather.replace();
   }
 
-  function showToast(msg, type) {
+  function toast(msg, type){
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = `toast show ${type}`;
-    setTimeout(() => { t.className = 'toast'; }, 3500);
+    t.innerText = msg; t.className='toast show';
+    setTimeout(()=> t.className='toast', 2800);
   }
 
-  init();
+  // reconnect UI
+  window.updateConnStatus = updateConnStatus;
 </script>
 </body>
 </html>

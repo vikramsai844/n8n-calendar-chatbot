@@ -151,7 +151,7 @@ n8n-calendar-chatbot/
 ## 👤 Author
 
 **Vikram**
-AI Automation Consultant — Caddam Technology Pvt Ltd
+AI Automation Consultant — Caddam software solutions Pvt Ltd
 
 ---
 

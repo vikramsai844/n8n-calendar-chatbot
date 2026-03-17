@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CADDAM · calendar ai (vikram)</title>
+  <title>CADDAMSS · calendar ai (Lexi)</title>
   <!-- fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- feather icons (lite) -->
@@ -636,8 +636,8 @@
       <div class="brand">
         <div class="brand-icon"><i data-feather="calendar"></i></div>
         <div class="brand-text">
-          <h2>Caddam AI</h2>
-          <span>by Vikram · n8n</span>
+          <h2>CADDAMSS AI</h2>
+          <span>by Lexi · n8n</span>
         </div>
       </div>
       <div class="status-pill" id="sideStatus">
@@ -672,7 +672,7 @@
       <div class="agent">
         <div class="avatar"><i data-feather="message-square"></i></div>
         <div>
-          <h4>Vikram's calendar</h4>
+          <h4>Lexi's calendar</h4>
           <p id="topStatus"><span class="dot" style="width:6px;height:6px;"></span> n8n + gemini</p>
         </div>
       </div>
@@ -724,7 +724,7 @@
     <div id="divProxy" style="display:none">
       <div class="field"><label>Proxy URL</label><input id="pInput" placeholder="http://localhost:3001/chat" value="http://localhost:3001/chat"></div>
     </div>
-    <div class="field"><label>Session ID (optional)</label><input id="sInput" value="vikram-calendar"></div>
+    <div class="field"><label>Session ID (optional)</label><input id="sInput" value="Lexi-calendar"></div>
 
     <div style="display:flex; gap:10px; margin-top:28px;">
       <button class="btn" style="flex:1" onclick="testConn()">🔌 test</button>
@@ -744,7 +744,7 @@
   // state
   let wUrl = localStorage.getItem('n8n_webhook') || '';
   let pUrl = localStorage.getItem('n8n_proxy') || 'http://localhost:3001/chat';
-  let session = localStorage.getItem('n8n_session') || 'vikram-calendar';
+  let session = localStorage.getItem('n8n_session') || 'Lexi-calendar';
   let mode = localStorage.getItem('n8n_mode') || 'direct';
   let busy = false;
 
@@ -800,7 +800,7 @@
       if(!pUrl){ toast('enter proxy url','error'); return; }
       localStorage.setItem('n8n_proxy', pUrl);
     }
-    session = document.getElementById('sInput').value.trim() || 'vikram-calendar';
+    session = document.getElementById('sInput').value.trim() || 'Lexi-calendar';
     localStorage.setItem('n8n_session', session);
     updateConnStatus(true);
     closeCfg();
@@ -913,7 +913,7 @@
   function renderWelcome(){
     const msgDiv = document.getElementById('messages');
     msgDiv.innerHTML = `<div class="welcome" id="welcome">
-      <div class="welcome-header">hey, i'm <br>Vikram's calendar</div>
+      <div class="welcome-header">hey, i'm <br>Lexi's calendar</div>
       <div class="welcome-desc">Schedule · check · manage — just chat or tap a chip.</div>
       <div class="chip-category">✨ create</div>
       <div class="chip-grid">
